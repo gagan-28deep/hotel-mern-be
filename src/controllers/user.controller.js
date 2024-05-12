@@ -2,6 +2,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { HotelUser } from "../models/user.model.js";
+import jwt from "jsonwebtoken";
 
 // Cookies option
 const options = {
@@ -128,4 +129,78 @@ export const login = asyncHandler(async (req, res) => {
         "User Logged In Successfully"
       )
     );
+});
+
+// Logout
+export const logout = asyncHandler(async (req, res) => {
+  await HotelUser.findByIdAndUpdate(
+    req?.user?._id,
+    {
+      $unset: {
+        refreshToken: 1,
+      },
+    },
+    { new: true }
+  );
+  return res
+    .status(200)
+    .clearCookie("accessToken")
+    .clearCookie("refreshToken")
+    .json(new ApiResponse(200, {}, "User Logged Out Successfully"));
+});
+
+// Generate Refresh Token
+
+export const refreshAccessToken = asyncHandler(async (req, res) => {
+  const incomingRefreshToken =
+    req.cookies?.refreshToken || req.body?.refreshToken;
+
+  if (!incomingRefreshToken) {
+    const error = new ApiError(401, "Unauthorized request");
+    return handleErrorResponse(res, error);
+  }
+  try {
+    const decodedToken = await jwt.verify(
+      incomingRefreshToken,
+      process.env.REFRESH_TOEKN_SECRET
+    );
+
+    const user = await HotelUser.findById(decodedToken?._id);
+    if (!user) {
+      const error = new ApiError(401, "Invalid Token");
+      return handleErrorResponse(res, error);
+    }
+
+    if (incomingRefreshToken !== user?.refreshToken) {
+      // throw new ApiError(401, "Refresh Token is expired or used");
+      const error = new ApiError(401, "Refresh Token is expired or used");
+      return handleErrorResponse(res, error);
+    }
+
+    const { accessToken, newRefreshToken } = await generateAccessRefreshToken(
+      user?._id
+    );
+    const options = {
+      httpOnly: true,
+      secure: true,
+    };
+    return res
+      .status(200)
+      .cookie("accessToken", accessToken, options)
+      .cookie("refreshToken", newRefreshToken, options)
+      .json(
+        new ApiResponse(
+          200,
+          {
+            accessToken,
+            refreshToken: newRefreshToken,
+          },
+          "Access Token Refreshed Successfully"
+        )
+      );
+  } catch (err) {
+    console.log("errrr", err);
+    const error = new ApiError(401, "Unauthorized request");
+    return handleErrorResponse(res, error);
+  }
 });
