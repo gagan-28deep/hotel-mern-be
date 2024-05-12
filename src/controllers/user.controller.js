@@ -82,7 +82,13 @@ export const signUp = asyncHandler(async (req, res) => {
     .status(201)
     .cookie("accessToken", accessToken, options)
     .cookie("refreshToken", refreshToken, options)
-    .json(new ApiResponse(201, createdUser, "User Created Successfully"));
+    .json(
+      new ApiResponse(
+        201,
+        { user: loggedInUser, accessToken, refreshToken },
+        "User Created Successfully"
+      )
+    );
 });
 
 // Login
@@ -115,5 +121,11 @@ export const login = asyncHandler(async (req, res) => {
     .status(200)
     .cookie("accessToken", accessToken, options)
     .cookie("refreshToken", refreshToken, options)
-    .json(new ApiResponse(200, loggedInUser, "User Logged In Successfully"));
+    .json(
+      new ApiResponse(
+        200,
+        { user: loggedInUser, accessToken, refreshToken },
+        "User Logged In Successfully"
+      )
+    );
 });
