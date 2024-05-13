@@ -149,6 +149,30 @@ export const logout = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "User Logged Out Successfully"));
 });
 
+// Get All Users
+export const getAllUsers = asyncHandler(async (req, res) => {
+  const users = await HotelUser.find();
+  if (!users) {
+    const error = new ApiError(400, "No users found");
+    return handleErrorResponse(res, error);
+  }
+  return res
+    .status(200)
+    .json(new ApiResponse(200, { users }, "Users Found Successfully"));
+});
+
+// Get Logged In User
+export const getLoggedInUser = asyncHandler(async (req, res) => {
+  const user = await HotelUser.findById(req?.user?._id);
+  if (!user) {
+    const error = new ApiError(400, "User not found");
+    return handleErrorResponse(res, error);
+  }
+  return res
+    .status(200)
+    .json(new ApiResponse(200, { user }, "User Found Successfully"));
+});
+
 // Generate Refresh Token
 
 export const refreshAccessToken = asyncHandler(async (req, res) => {
