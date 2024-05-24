@@ -1,7 +1,7 @@
 import express from "express";
 import { verifyJwt } from "../middleware/auth.middleware.js";
 import { upload } from "../middleware/multer.middleware.js";
-import { createHotel } from "../controllers/myHotels.controller.js";
+import { createHotel, getAllHotels } from "../controllers/myHotels.controller.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 const router = express.Router();
@@ -17,5 +17,7 @@ router.route("/").post(upload.array("imageFiles", 6), createHotel);
 //         maxCount : 6
 //     }
 // ]))
+
+router.route("/").get(getAllHotels)
 
 export default router;
