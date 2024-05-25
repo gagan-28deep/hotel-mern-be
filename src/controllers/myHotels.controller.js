@@ -71,3 +71,42 @@ export const getAllHotels = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, { hotels }, "Hotels Found Successfully"));
 });
 
+// Get a particular hotel of the logged in user
+export const getHotelById = asyncHandler(async (req, res) => {
+  const hotel = await Hotel.findOne({
+    _id: req.params.id,
+    userId: req.user._id,
+  });
+  if (!hotel) {
+    const error = new ApiError(400, "No hotel found");
+    return handleErrorResponse(res, error);
+  }
+  return res
+    .status(200)
+    .json(new ApiResponse(200, { hotel }, "Hotel Found Successfully"));
+});
+
+// Update a hotel details
+export const updateHotelById = asyncHandler(async (req, res) => {
+  const updatedHotel = await Hotel.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+  });
+  if (!updatedHotel) {
+    const error = new ApiError(400, "Something went wrong while updating");
+    return handleErrorResponse(res, error);
+  }
+
+  const files = req.files;
+  if (files) {
+    const updatedImageUrls = await uploadOnCloudinary(files);
+    updatedHotel.imageUrls = [
+      ...updatedImageUrls,
+      ...(updatedHotel?.imageUrls || []),
+    ];
+  }
+
+  await updatedHotel.save();
+  return res
+    .status(200)
+    .json(new ApiResponse(200, { updatedHotel }, "Hotel Updated Successfully"));
+});

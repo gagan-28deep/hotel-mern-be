@@ -1,13 +1,19 @@
 import express from "express";
 import { verifyJwt } from "../middleware/auth.middleware.js";
 import { upload } from "../middleware/multer.middleware.js";
-import { createHotel, getAllHotels } from "../controllers/myHotels.controller.js";
+import {
+  createHotel,
+  getAllHotels,
+  getHotelById,
+  updateHotelById,
+} from "../controllers/myHotels.controller.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 const router = express.Router();
 
 router.use(verifyJwt);
 
+// Create a new hotel
 router.route("/").post(upload.array("imageFiles", 6), createHotel);
 
 //  or
@@ -18,6 +24,13 @@ router.route("/").post(upload.array("imageFiles", 6), createHotel);
 //     }
 // ]))
 
-router.route("/").get(getAllHotels)
+// Get all hotels
+router.route("/").get(getAllHotels);
+
+// Get a particular hotel by id
+router.route("/:id").get(getHotelById);
+
+// Updata a hotel details
+router.route("/:id").put(upload.array("imageFiles", 6), updateHotelById);
 
 export default router;
