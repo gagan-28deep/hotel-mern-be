@@ -20,5 +20,9 @@ import userRoutes from "./routes/user.routes.js";
 // Hotel Routes
 import hotelRoutes from "./routes/myHotels.routes.js";
 
+// All hotel routes
+import allHotelRoutes from "./routes/allHotels.routes.js";
+
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/hotel", hotelRoutes);
+app.use("/api/v1/allhotels", allHotelRoutes);

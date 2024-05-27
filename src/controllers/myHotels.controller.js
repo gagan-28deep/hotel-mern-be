@@ -60,7 +60,7 @@ export const createHotel = asyncHandler(async (req, res) => {
 });
 
 // Get all hotels of the logged in user
-export const getAllHotels = asyncHandler(async (req, res) => {
+export const getAllHotelsOfUser = asyncHandler(async (req, res) => {
   const hotels = await Hotel.find({ userId: req.user._id });
   if (!hotels) {
     const error = new ApiError(400, "No hotels found");

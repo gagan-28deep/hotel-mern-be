@@ -3,7 +3,7 @@ import { verifyJwt } from "../middleware/auth.middleware.js";
 import { upload } from "../middleware/multer.middleware.js";
 import {
   createHotel,
-  getAllHotels,
+  getAllHotelsOfUser,
   getHotelById,
   updateHotelById,
 } from "../controllers/myHotels.controller.js";
@@ -25,7 +25,7 @@ router.route("/").post(upload.array("imageFiles", 6), createHotel);
 // ]))
 
 // Get all hotels
-router.route("/").get(getAllHotels);
+router.route("/").get(getAllHotelsOfUser);
 
 // Get a particular hotel by id
 router.route("/:id").get(getHotelById);
