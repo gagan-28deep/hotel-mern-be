@@ -23,6 +23,19 @@ export const getAllHotels = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, { hotels }, "Hotels Found Successfully"));
 });
 
+export const viewHotelById = asyncHandler(async (req, res) => {
+  const hotel = await Hotel.findOne({
+    _id: req.params.id,
+  });
+  if (!hotel) {
+    const error = new ApiError(400, "No hotel found");
+    return handleErrorResponse(res, error);
+  }
+  return res
+    .status(200)
+    .json(new ApiResponse(200, { hotel }, "Hotel Found Successfully"));
+});
+
 // Get hotels based on search
 
 export const searchHotels = asyncHandler(async (req, res) => {
