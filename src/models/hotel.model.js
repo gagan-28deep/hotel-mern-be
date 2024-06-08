@@ -1,5 +1,42 @@
 import mongoose, { Schema } from "mongoose";
 
+const bookingSchema = new Schema({
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: "HotelUser",
+  },
+  hotelId: {
+    type: Schema.Types.ObjectId,
+    ref: "Hotel",
+  },
+  checkIn: {
+    type: Date,
+    required: true,
+  },
+  checkOut: {
+    type: Date,
+    required: true,
+  },
+  firstName: {
+    type: String,
+  },
+  lastName: {
+    type: String,
+  },
+  email: {
+    type: String,
+  },
+  adultCount: {
+    type: Number,
+  },
+  childCount: {
+    type: Number,
+  },
+  totalCost: {
+    type: Number,
+  },
+});
+
 const hotelSchema = new Schema(
   {
     // Which user has created this hotel
@@ -59,6 +96,8 @@ const hotelSchema = new Schema(
       type: [String],
       required: true,
     },
+    // Bookings
+    bookings: [bookingSchema],
   },
   { timestamps: true }
 );

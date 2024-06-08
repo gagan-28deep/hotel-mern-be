@@ -2,6 +2,13 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { Hotel } from "../models/hotel.model.js";
+import Stripe from "stripe";
+import dotenv from "dotenv";
+dotenv.config({
+  path: "../../.env",
+});
+
+const stripe = new Stripe(process.env.STRIPE_API_KEY);
 
 // Handle error response
 const handleErrorResponse = (res, error) => {
@@ -83,6 +90,59 @@ export const searchHotels = asyncHandler(async (req, res) => {
       "Hotels Found Successfully"
     )
   );
+});
+
+// Booking of a hotel
+
+export const bookHotel = asyncHandler(async (req, res) => {
+  const hotelId = req?.params?.hotelId;
+  const paymentIntentId = req.body?.data?.paymentIntentId;
+  const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+  if (!paymentIntent) {
+    const error = new ApiError(400, "Payment intent not found");
+    return handleErrorResponse(res, error);
+  }
+  let userId = req.user._id;
+  // Convert this to string
+  userId = userId.toString();
+  if (
+    paymentIntent?.metadata?.hotelId !== hotelId ||
+    paymentIntent?.metadata?.userId !== userId
+  ) {
+    const error = new ApiError(400, "payment intent mismatched");
+    return handleErrorResponse(res, error);
+  }
+  if (paymentIntent?.status !== "succeeded") {
+    const error = new ApiError(
+      400,
+      `Payment intent not succeeded, status: ${paymentIntent?.status}`
+    );
+    return handleErrorResponse(res, error);
+  }
+
+  const newBooking = {
+    userId: req.user._id,
+    hotelId,
+    ...req.body?.data,
+  };
+
+  const hotel = await Hotel.findByIdAndUpdate(
+    { _id: hotelId },
+    {
+      $push: {
+        bookings: newBooking,
+      },
+    },
+    { new: true }
+  );
+  if (!hotel) {
+    const error = new ApiError(400, "Hotel not found");
+    return handleErrorResponse(res, error);
+  }
+  await hotel.save();
+  return res
+    .status(200)
+    .json(new ApiResponse(200, { hotel }, "Hotel booked successfully"));
 });
 
 // Search Query
