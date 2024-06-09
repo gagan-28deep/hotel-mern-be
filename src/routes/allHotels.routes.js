@@ -10,7 +10,7 @@ import { createPaymentIntent } from "../controllers/stripeController.js";
 
 const router = express.Router();
 
-// router.route("/getAllHotels").get(getAllHotels);
+router.route("/getAllRegisteredHotels").get(getAllHotels);
 router.route("/getAllHotels").post(searchHotels);
 router.route("/viewHotelById/:id").get(viewHotelById);
 

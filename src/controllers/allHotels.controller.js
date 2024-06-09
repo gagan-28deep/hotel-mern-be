@@ -20,7 +20,7 @@ const handleErrorResponse = (res, error) => {
 
 // Get all the hotels
 export const getAllHotels = asyncHandler(async (req, res) => {
-  const hotels = await Hotel.find();
+  const hotels = await Hotel.find().sort({ createdAt: -1 });
   if (!hotels) {
     const error = new ApiError(400, "No hotels found");
     return handleErrorResponse(res, error);

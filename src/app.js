@@ -23,6 +23,10 @@ import hotelRoutes from "./routes/myHotels.routes.js";
 // All hotel routes
 import allHotelRoutes from "./routes/allHotels.routes.js";
 
+// My booking routes
+import myBookingRoutes from "./routes/myBookings.routes.js";
+
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/hotel", hotelRoutes);
 app.use("/api/v1/allhotels", allHotelRoutes);
+app.use("/api/v1/mybookings", myBookingRoutes);
