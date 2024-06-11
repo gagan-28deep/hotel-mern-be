@@ -156,11 +156,11 @@ const constructSearchQuery = (queryParams = {}) => {
       { country: queryParams?.destination },
     ];
   }
-  if (queryParams?.adultCount) {
-    constructedQuery.adultCount = queryParams?.adultCount;
+  if (queryParams?.adultCount && queryParams?.adultCount >= 1) {
+    constructedQuery.adultCount = parseInt(queryParams?.adultCount);
   }
-  if (queryParams?.childCount) {
-    constructedQuery.childCount = queryParams?.childCount;
+  if (queryParams?.childCount && queryParams?.childCount > 0) {
+    constructedQuery.childCount = parseInt(queryParams?.childCount);
   }
 
   if (queryParams?.facilities && queryParams?.facilities?.length > 0) {
